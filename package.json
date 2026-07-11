@@ -1,0 +1,21 @@
+{
+    "name": "week 1",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/server.ts",
+    "type": "module",
+    "scripts": {
+        "server": "pnpm tsx --watch src/server.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Abdullah Fatota",
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "tsx": "^4.23.0",
+        "typescript": "^7.0.2"
+    },
+    "dependencies": {
+        "express": "^5.2.1"
+    }
+}
