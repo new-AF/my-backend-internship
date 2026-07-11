@@ -20,7 +20,7 @@ Always returns
 
 ## `POST /echo`
 
-Mandates request body be in JSON and have `message` key, and returns back the same value that was sent.
+Request body must be in JSON and have `message` key. It returns back the same value that was sent.
 
 Request:
 
