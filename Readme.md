@@ -6,6 +6,8 @@ I used TypeScript + Express as stacks
 
 # Week 1
 
+> Live deploy service: **https://my-backend-internship-week-1.onrender.com/**
+
 I defined two JSON entry points: `GET /hello` and `POST /echo`
 
 ## `GET /hello`
