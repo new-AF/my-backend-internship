@@ -7,3 +7,9 @@ I used TypeScript + Express as stacks
 # Week 1
 
 [Week 1](week-1/Readme.md)
+
+# Week 1 Redux
+
+Because original assignment was changed (never do that)
+
+[Week 1 Redux](week-1-redux/Readme.md)
