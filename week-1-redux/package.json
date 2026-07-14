@@ -5,6 +5,7 @@
     "main": "src/server.ts",
     "type": "module",
     "scripts": {
+        "stage-0-server": "pnpm tsx --watch src/stage-0-server.ts",
         "dev": "pnpm tsx --watch src/server.ts",
         "server": "pnpm tsx src/server.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,6 +18,7 @@
         "typescript": "^7.0.2"
     },
     "dependencies": {
-        "express": "^5.2.1"
+        "express": "^5.2.1",
+        "swagger-ui-express": "^5.0.1"
     }
 }
