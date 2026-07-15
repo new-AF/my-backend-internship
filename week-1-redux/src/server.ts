@@ -11,6 +11,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // all bodies must be json
 app.use(express.json());
 
+// HTTP protocol, GET "method"/"verb"
 app.get("/", (_request, response) => {
     response.status(200);
     response.json({ message: "Hello world from server!" });

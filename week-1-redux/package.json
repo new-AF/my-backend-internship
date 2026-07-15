@@ -5,7 +5,6 @@
     "main": "src/server.ts",
     "type": "module",
     "scripts": {
-        "stage-0-server": "pnpm tsx --watch src/stage-0-server.ts",
         "dev": "pnpm tsx --watch src/server.ts",
         "server": "pnpm tsx src/server.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
