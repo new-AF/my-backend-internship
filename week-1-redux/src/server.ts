@@ -73,6 +73,52 @@ app.get("/tasks/:id", (request, response) => {
     response.json(found);
 });
 
+// Stage 3: POST create
+app.post("/tasks", (request, response) => {
+    const { body } = request;
+
+    // bad request
+    if (body === undefined) {
+        response.status(400);
+        response.json({ error: "missing body." });
+    }
+
+    if ("title" in body === false) {
+        response.status(400);
+        response.json({ error: "missing title key in request body." });
+    }
+
+    if (!body.title) {
+        response.status(400);
+        response.json({ error: "bad title value in request body." });
+    }
+
+    if ("done" in body === false) {
+        response.status(400);
+        response.json({ error: "missing done key in request body." });
+    }
+
+    if (!body.done) {
+        response.status(400);
+        response.json({ error: "bad done value in request body." });
+    }
+
+    // create it
+    const { title, done } = body;
+    const id = storedTasks.length + 1;
+
+    const task = {
+        id,
+        title,
+        done,
+    };
+
+    storedTasks.push(task);
+
+    response.status(201);
+    response.json(task);
+});
+
 // launch server
 app.listen(PORT, () => {
     console.log(`server running at port ${PORT}`);
