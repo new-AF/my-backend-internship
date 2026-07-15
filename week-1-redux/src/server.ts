@@ -35,7 +35,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // all bodies must be json
 app.use(express.json());
 
-// HTTP protocol, GET "method"/"verb"
+// Stage 1: HTTP protocol, GET "method"/"verb"
 app.get("/", (_request, response) => {
     response.status(200);
     response.json({ name: "Task API", version: "1.0", endpoints: ["/tasks"] });
@@ -52,7 +52,7 @@ app.get("/tasks", (_request, response) => {
     response.json(storedTasks);
 });
 
-// GET by :id
+// Stage 2: GET by :id
 app.get("/tasks/:id", (request, response) => {
     const { params } = request;
     const { id: idString } = params;
@@ -60,6 +60,7 @@ app.get("/tasks/:id", (request, response) => {
 
     const found = storedTasks.find(({ id: storedId }) => id === storedId);
 
+    // not found
     if (!found) {
         response.status(404);
         response.json({
