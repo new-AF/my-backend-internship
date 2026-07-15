@@ -2,6 +2,30 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" with { type: "json" };
 
+type Task = {
+    id: number;
+    title: string;
+    done: boolean;
+};
+
+const storedTasks: Task[] = [
+    {
+        id: 1,
+        title: "Complete assignment 1 original",
+        done: true,
+    },
+    {
+        id: 2,
+        title: "Watch movie",
+        done: false,
+    },
+    {
+        id: 3,
+        title: "Play game",
+        done: false,
+    },
+];
+
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const app = express();
 
@@ -20,6 +44,32 @@ app.get("/", (_request, response) => {
 app.get("/health", (_request, response) => {
     response.status(200);
     response.json({ status: "Ok" });
+});
+
+// CRUD app begininning
+app.get("/tasks", (_request, response) => {
+    response.status(200);
+    response.json(storedTasks);
+});
+
+// GET by :id
+app.get("/tasks/:id", (request, response) => {
+    const { params } = request;
+    const { id: idString } = params;
+    const id = Number(idString);
+
+    const found = storedTasks.find(({ id: storedId }) => id === storedId);
+
+    if (!found) {
+        response.status(404);
+        response.json({
+            error: `Task ${id} not found.`,
+        });
+    }
+
+    // found
+    response.status(200);
+    response.json(found);
 });
 
 // launch server
