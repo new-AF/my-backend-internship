@@ -14,7 +14,12 @@ app.use(express.json());
 // HTTP protocol, GET "method"/"verb"
 app.get("/", (_request, response) => {
     response.status(200);
-    response.json({ message: "Hello world from server!" });
+    response.json({ name: "Task API", version: "1.0", endpoints: ["/tasks"] });
+});
+
+app.get("/health", (_request, response) => {
+    response.status(200);
+    response.json({ status: "Ok" });
 });
 
 // launch server
