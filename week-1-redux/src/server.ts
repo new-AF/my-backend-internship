@@ -73,34 +73,64 @@ app.get("/tasks/:id", (request, response) => {
     response.json(found);
 });
 
+// to not repeat code
+type ValidationResult = { success: boolean; status?: number; error?: string };
+
+const validateBody = (body): ValidationResult => {
+    // bad request
+    if (body === undefined) {
+        return {
+            success: false,
+            status: 400,
+            error: "missing body.",
+        };
+    }
+
+    if ("title" in body === false) {
+        return {
+            success: false,
+            status: 400,
+            error: "missing title key in request body.",
+        };
+    }
+
+    if (!body.title) {
+        return {
+            success: false,
+            status: 400,
+            error: "bad title value in request body.",
+        };
+    }
+
+    if ("done" in body === false) {
+        return {
+            success: false,
+            status: 400,
+            error: "missing done key in request body.",
+        };
+    }
+
+    if (!body.done) {
+        return {
+            success: false,
+            status: 400,
+            error: "bad done value in request body.",
+        };
+    }
+
+    return { success: true };
+};
+
 // Stage 3: POST create
 app.post("/tasks", (request, response) => {
     const { body } = request;
 
-    // bad request
-    if (body === undefined) {
-        response.status(400);
-        response.json({ error: "missing body." });
-    }
+    const { success, status, error } = validateBody(body);
 
-    if ("title" in body === false) {
-        response.status(400);
-        response.json({ error: "missing title key in request body." });
-    }
-
-    if (!body.title) {
-        response.status(400);
-        response.json({ error: "bad title value in request body." });
-    }
-
-    if ("done" in body === false) {
-        response.status(400);
-        response.json({ error: "missing done key in request body." });
-    }
-
-    if (!body.done) {
-        response.status(400);
-        response.json({ error: "bad done value in request body." });
+    if (!success) {
+        response.status(status);
+        response.json(error);
+        return;
     }
 
     // create it
