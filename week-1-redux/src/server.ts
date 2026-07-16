@@ -1,30 +1,7 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" with { type: "json" };
-
-type Task = {
-    id: number;
-    title: string;
-    done: boolean;
-};
-
-const storedTasks: Task[] = [
-    {
-        id: 1,
-        title: "Complete assignment 1 original",
-        done: true,
-    },
-    {
-        id: 2,
-        title: "Watch movie",
-        done: false,
-    },
-    {
-        id: 3,
-        title: "Play game",
-        done: false,
-    },
-];
+import { storedTasks } from "./storedTasks";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 export const app = express();
