@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { app } from "@/server";
 import { storedTasks } from "@/storedTasks";
 
-const runAllTests = () => {
+const testGET = () => {
     it("GET /", async () => {
         const response = await request(app).get("/");
         expect(response.status).toBe(200);
@@ -26,15 +26,25 @@ const runAllTests = () => {
         expect(response.status).toBe(200);
         expect(response.body).toStrictEqual(storedTasks[1]);
     });
+};
+
+const testPOST = () => {
+    const userSentTask = { title: "test", done: true };
+    const savedTask = { ...userSentTask, id: 4 };
 
     it("POST /tasks someObject", async () => {
-        const testObject = { title: "test", done: true };
-
-        const response = await request(app).post("/tasks").send(testObject);
+        const response = await request(app).post("/tasks").send(userSentTask);
 
         expect(response.status).toBe(201);
-        expect(response.body).toStrictEqual({ ...testObject, id: 4 });
+        expect(response.body).toStrictEqual(savedTask);
+    });
+
+    it("GET /tasks", async () => {
+        const response = await request(app).get("/tasks");
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual(storedTasks);
     });
 };
 
-describe("Testing CRUD", () => runAllTests());
+describe("Testing GET method", () => testGET());
+describe("Testing POST method", () => testPOST());
