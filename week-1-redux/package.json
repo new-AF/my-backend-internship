@@ -5,16 +5,19 @@
     "main": "src/server.ts",
     "type": "module",
     "scripts": {
-        "dev": "pnpm tsx --watch src/server.ts",
-        "server": "pnpm tsx src/server.ts",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "tsx --watch src/server.ts",
+        "server": "tsx src/server.ts",
+        "test": "vitest"
     },
     "keywords": [],
     "author": "Abdullah Fatota",
     "devDependencies": {
         "@types/express": "^5.0.6",
+        "@types/supertest": "^7.2.1",
+        "supertest": "^7.2.2",
         "tsx": "^4.23.0",
-        "typescript": "^7.0.2"
+        "typescript": "^7.0.2",
+        "vitest": "^4.1.10"
     },
     "dependencies": {
         "express": "^5.2.1",

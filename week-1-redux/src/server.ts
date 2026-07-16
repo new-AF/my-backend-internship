@@ -27,7 +27,7 @@ const storedTasks: Task[] = [
 ];
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
-const app = express();
+export const app = express();
 
 // run swagger with ./swagger.json OpenAPI spec
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -74,35 +74,75 @@ app.get("/tasks/:id", (request, response) => {
 });
 
 // to not repeat code
-type ValidationResult = { success: boolean; status?: number; error?: string };
+type ValidationResult = { success: boolean; error?: string };
 
-const validateBody = (body): ValidationResult => {
+const validateBody = (
+    body: Task,
+    validationType: "all" | "any",
+): ValidationResult => {
     // bad request
     if (body === undefined) {
         return {
             success: false,
-            status: 400,
             error: "missing body.",
         };
     }
 
-    if ("title" in body === false) {
+    const { title, done } = body;
+
+    if (
+        validationType === "all" ||
+        (validationType === "any" && title && done)
+    ) {
+        const titleResult = validateTitle(title);
+        const doneResult = validateDone(done);
+
+        return {
+            success: titleResult.success && doneResult.success,
+            error: (() => {
+                if (!titleResult.success && !doneResult.success) {
+                    return "both title and done missing";
+                }
+                if (!titleResult.success) {
+                    return titleResult.error;
+                }
+                return doneResult.error;
+            })(),
+        };
+    }
+
+    if (validationType === "any") {
+        return validateTitle(title);
+    }
+    if (validationType === "done") {
+        return validateDone(done);
+    }
+
+    return { success: true };
+};
+
+const validateTitle = (title: string): ValidationResult => {
+    if (title === undefined) {
         return {
             success: false,
-            status: 400,
+
             error: "missing title key in request body.",
         };
     }
 
-    if (!body.title) {
+    // makeshift runtime validation
+    if (typeof title !== "string") {
         return {
             success: false,
-            status: 400,
             error: "bad title value in request body.",
         };
     }
 
-    if ("done" in body === false) {
+    return { success: true };
+};
+
+const validateDone = (done: boolean): ValidationResult => {
+    if (done === undefined) {
         return {
             success: false,
             status: 400,
@@ -110,7 +150,8 @@ const validateBody = (body): ValidationResult => {
         };
     }
 
-    if (!body.done) {
+    // makeshift runtime validation
+    if (typeof done !== "boolean") {
         return {
             success: false,
             status: 400,
@@ -125,15 +166,46 @@ const validateBody = (body): ValidationResult => {
 app.post("/tasks", (request, response) => {
     const { body } = request;
 
-    const { success, status, error } = validateBody(body);
+    // validate
+    const { success, error } = validateBody(body, "all");
 
+    // bad request
     if (!success) {
-        response.status(status);
+        response.status(404);
         response.json(error);
         return;
     }
 
     // create it
+    const { title, done } = body;
+    const id = storedTasks.length + 1;
+
+    const task = {
+        id,
+        title,
+        done,
+    };
+
+    storedTasks.push(task);
+
+    response.status(201);
+    response.json(task);
+});
+
+// Stage 4: full CRUD: PUT & DELETE
+app.put("/tasks", (request, response) => {
+    const { body } = request;
+
+    const { success, error } = validateBody(body, "any");
+
+    // bad request
+    if (!success) {
+        response.status(404);
+        response.json(error);
+        return;
+    }
+
+    // create it, either one is okay
     const { title, done } = body;
     const id = storedTasks.length + 1;
 
