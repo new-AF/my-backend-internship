@@ -42,6 +42,7 @@ const testPOST = () => {
     it("GET /tasks", async () => {
         const response = await request(app).get("/tasks");
         expect(response.status).toBe(200);
+        // the array has been appended to
         expect(response.body).toStrictEqual(storedTasks);
     });
 };
