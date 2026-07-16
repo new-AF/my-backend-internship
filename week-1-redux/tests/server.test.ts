@@ -8,8 +8,9 @@ const runAllTests = () => {
         expect(response.status).toBe(200);
     });
     it("GET /health", async () => {
-        const response = await request(app).get("/");
-        expect(response.status).toBe({ status: "Ok" });
+        const response = await request(app).get("/health");
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual({ status: "Ok" });
     });
 };
 
