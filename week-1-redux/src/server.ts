@@ -148,8 +148,8 @@ app.post("/tasks", (request, response) => {
 
     // bad request
     if (!success) {
-        response.status(404);
-        response.json(error);
+        response.status(400);
+        response.json({ error });
         return;
     }
 
