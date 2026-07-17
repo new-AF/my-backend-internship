@@ -1,7 +1,7 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./swagger.json" with { type: "json" };
-import { storedTasks } from "./storedTasks";
+import { storedTasks, Task } from "./storedTasks";
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 export const app = express();
@@ -177,13 +177,25 @@ app.put("/tasks", (request, response) => {
 
     // bad request
     if (!success) {
-        response.status(404);
-        response.json(error);
+        response.status(400);
+        response.json({ error });
+        return;
+    }
+
+    const { title, done } = body;
+
+    // enforce idempotancy: if task exists, dont add it again
+    const found = storedTasks.find(
+        (obj) => obj.title === title && obj.done === done,
+    );
+
+    if (found) {
+        response.status(200);
+        response.json(found);
         return;
     }
 
     // create it, either one is okay
-    const { title, done } = body;
     const id = storedTasks.length + 1;
 
     const task = {

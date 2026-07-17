@@ -1,7 +1,7 @@
 import request from "supertest";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { app } from "@/server";
-import { storedTasks } from "@/storedTasks";
+import { storedTasks, reset } from "@/storedTasks";
 
 const testGET = () => {
     it("GET /", async () => {
@@ -120,5 +120,99 @@ const testPOST = () => {
     });
 };
 
+const testPUT = () => {
+    // reset "db"
+    beforeAll(reset);
+
+    const userSentTask = { title: "test", done: true };
+    const savedTask = { ...userSentTask, id: 4 };
+
+    it("PUT /tasks validJSON", async () => {
+        const response = await request(app).put("/tasks").send(userSentTask);
+
+        expect(response.status).toBe(201);
+        expect(response.body).toStrictEqual(savedTask);
+    });
+
+    it("GET /tasks userSentTask saved", async () => {
+        const response = await request(app).get("/tasks");
+        expect(response.status).toBe(200);
+        // the array has been appended to
+        expect(response.body).toStrictEqual(storedTasks);
+    });
+
+    it("PUT /tasks invalidJSON no body", async () => {
+        const response = await request(app).put("/tasks").send();
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON empty json", async () => {
+        const response = await request(app).put("/tasks").send({});
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON title undefined", async () => {
+        const response = await request(app)
+            .put("/tasks")
+            .send({ title: undefined });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON title null", async () => {
+        const response = await request(app).put("/tasks").send({ title: null });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON title null, done valid", async () => {
+        const response = await request(app)
+            .put("/tasks")
+            .send({ title: null, done: true });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON title valid, done invalid", async () => {
+        const response = await request(app)
+            .put("/tasks")
+            .send({ title: "test", done: 1 });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks invalidJSON title invalid, done invalid", async () => {
+        const response = await request(app)
+            .put("/tasks")
+            .send({ title: ["test"], done: 1 });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it("PUT /tasks same validJSON; idempotent", async () => {
+        const response = await request(app).put("/tasks").send(userSentTask);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual(savedTask);
+    });
+
+    it("GET /tasks userSentTask saved", async () => {
+        const response = await request(app).get("/tasks");
+        expect(response.status).toBe(200);
+        // the array has been appended to
+        expect(response.body).toStrictEqual(storedTasks);
+    });
+};
+
 describe("Testing GET method", () => testGET());
 describe("Testing POST method", () => testPOST());
+describe("Testing PUT method", () => testPUT());

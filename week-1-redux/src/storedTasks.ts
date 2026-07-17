@@ -4,6 +4,7 @@ export type Task = {
     done: boolean;
 };
 
+// in-memory storage
 export const storedTasks: Task[] = [
     {
         id: 1,
@@ -21,3 +22,8 @@ export const storedTasks: Task[] = [
         done: false,
     },
 ];
+
+// needed for testing
+export const reset = () => {
+    storedTasks.length = 3;
+};
