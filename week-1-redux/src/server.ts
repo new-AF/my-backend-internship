@@ -229,7 +229,7 @@ app.delete("/tasks/:id", (request, response) => {
 
     // delete  element
     storedTasks.splice(foundIndex, 1);
-    response.status(200);
+    response.status(204);
     response.send();
 });
 
