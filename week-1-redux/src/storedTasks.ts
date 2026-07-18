@@ -4,8 +4,7 @@ export type Task = {
     done: boolean;
 };
 
-// in-memory storage
-export const storedTasks: Task[] = [
+const initialTasks: Task[] = [
     {
         id: 1,
         title: "Complete assignment 1 original",
@@ -23,7 +22,15 @@ export const storedTasks: Task[] = [
     },
 ];
 
+// in-memory storage
+export const storedTasks: Task[] = [];
+
 // needed for testing
 export const reset = () => {
-    storedTasks.length = 3;
+    storedTasks.length = 0;
+    initialTasks.forEach((obj) => {
+        storedTasks.push(structuredClone(obj));
+    });
 };
+
+reset();

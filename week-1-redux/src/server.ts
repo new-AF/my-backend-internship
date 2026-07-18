@@ -211,6 +211,8 @@ app.put("/tasks", (request, response) => {
 });
 
 app.delete("/tasks/:id", (request, response) => {
+    debugger;
+
     const { id: idString } = request.params;
 
     if (!idString) {

@@ -219,21 +219,21 @@ const testDELETE = () => {
     it("DELETE /tasks/1", async () => {
         const response = await request(app).delete("/tasks/1");
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(204);
         expect(response.body).toStrictEqual({});
     });
 
     it("DELETE /tasks/2", async () => {
         const response = await request(app).delete("/tasks/2");
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(204);
         expect(response.body).toStrictEqual({});
     });
 
     it("DELETE /tasks/3", async () => {
         const response = await request(app).delete("/tasks/3");
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(204);
         expect(response.body).toStrictEqual({});
     });
 
