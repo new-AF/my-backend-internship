@@ -213,6 +213,39 @@ const testPUT = () => {
     });
 };
 
+const testDELETE = () => {
+    beforeAll(reset);
+
+    it("DELETE /tasks/1", async () => {
+        const response = await request(app).delete("/tasks/1");
+
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual({});
+    });
+
+    it("DELETE /tasks/2", async () => {
+        const response = await request(app).delete("/tasks/2");
+
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual({});
+    });
+
+    it("DELETE /tasks/3", async () => {
+        const response = await request(app).delete("/tasks/3");
+
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual({});
+    });
+
+    it("DELETE /tasks/4", async () => {
+        const response = await request(app).delete("/tasks/4");
+
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("error");
+    });
+};
+
 describe("Testing GET method", () => testGET());
 describe("Testing POST method", () => testPOST());
 describe("Testing PUT method", () => testPUT());
+describe("Testing DELETE method", () => testDELETE());

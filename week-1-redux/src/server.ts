@@ -210,6 +210,29 @@ app.put("/tasks", (request, response) => {
     response.json(task);
 });
 
+app.delete("/tasks/:id", (request, response) => {
+    const { id: idString } = request.params;
+
+    if (!idString) {
+        response.status(400);
+        response.json({ error: "missing id to delete" });
+    }
+
+    const id = Number(idString);
+
+    const foundIndex = storedTasks.findIndex((obj) => obj.id === id);
+
+    if (foundIndex === -1) {
+        response.status(404);
+        response.json({ error: "not found id to delete" });
+    }
+
+    // delete  element
+    storedTasks.splice(foundIndex, 1);
+    response.status(200);
+    response.send();
+});
+
 // launch server
 app.listen(PORT, () => {
     console.log(`server running at port ${PORT}`);
