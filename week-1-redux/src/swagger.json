@@ -1,64 +1,36 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.0.3",
     "info": {
         "title": "Tasks API",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "description": "Simple CRUD API for managing tasks."
     },
     "servers": [
         {
             "url": "http://localhost:3000"
         }
     ],
-    "components": {
-        "schemas": {
-            "Task": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "done": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "TaskContent": {
-                "type": "object",
-                "required": ["title", "done"],
-                "properties": {
-                    "title": {
-                        "type": "string"
-                    },
-                    "done": {
-                        "type": "boolean"
-                    }
-                }
-            }
-        }
-    },
     "paths": {
         "/": {
             "get": {
+                "summary": "Root endpoint",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "API is reachable"
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "Server health status",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "name": {
-                                            "type": "string"
-                                        },
-
-                                        "version": { "type": "string" },
-                                        "endpoints": {
-                                            "type": "array",
-                                            "items": { "type": "string" }
-                                        }
-                                    }
+                                    "$ref": "#/components/schemas/Health"
                                 }
                             }
                         }
@@ -66,11 +38,12 @@
                 }
             }
         },
-        "/health": {
+        "/tasks": {
             "get": {
+                "summary": "Get all tasks",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "List of tasks",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -83,103 +56,226 @@
                         }
                     }
                 }
-            }
-        },
-        "/tasks": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
             },
             "post": {
+                "summary": "Create a task",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TaskContent"
+                                "$ref": "#/components/schemas/CreateTask"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Created task"
-                    },
-                    "400": {
-                        "description": "Bad request"
-                    }
-                }
-            },
-            "put": {
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TaskContent"
+                        "description": "Task created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
                             }
                         }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request"
-                    },
-                    "403": {
-                        "description": "User is forbidden from creating a resource at that id"
+                        "description": "Invalid request body",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
         "/tasks/{id}": {
             "get": {
+                "summary": "Get task by ID",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "$ref": "#/components/parameters/TaskId"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Task found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Task not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update a task",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/TaskId"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTask"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Task updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Task not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             },
             "delete": {
+                "summary": "Delete a task",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "$ref": "#/components/parameters/TaskId"
                     }
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
+                        "description": "Task deleted"
                     },
                     "404": {
-                        "description": "Not Found"
+                        "description": "Task not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "parameters": {
+            "TaskId": {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "description": "Task ID",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "schemas": {
+            "Health": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "Ok"
+                    }
+                },
+                "required": ["status"]
+            },
+            "Task": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Buy milk"
+                    },
+                    "done": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "required": ["id", "title", "done"]
+            },
+            "CreateTask": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "example": "Buy milk"
+                    }
+                },
+                "required": ["title"],
+                "additionalProperties": false
+            },
+            "UpdateTask": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "example": "Buy milk"
+                    },
+                    "done": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "required": ["title", "done"],
+                "additionalProperties": false
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Task not found"
+                    }
+                },
+                "required": ["error"]
             }
         }
     }
