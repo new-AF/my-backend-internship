@@ -246,21 +246,18 @@ const testDELETE = () => {
 const testAssignmentTasks = () => {
     beforeAll(reset);
 
-    // assignment task
     it("GET /tasks/1", async () => {
         const response = await request(app).get("/tasks/1");
         expect(response.status).toBe(200);
         expect(response.body).toStrictEqual(storedTasks[0]);
     });
 
-    // assignment task
     it("GET /tasks/99", async () => {
         const response = await request(app).get("/tasks/99");
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty("error");
     });
 
-    // assignment task
     it("POST /tasks some milk", async () => {
         const buyMilk = { title: "Buy milk" };
         const response = await request(app).post("/tasks").send(buyMilk);
