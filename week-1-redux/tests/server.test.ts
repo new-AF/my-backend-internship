@@ -29,14 +29,17 @@ const testGET = () => {
 };
 
 const testPOST = () => {
-    const userSentTask = { title: "test", done: true };
-    const savedTask = { ...userSentTask, id: 4 };
+    const userSentTask = { title: "test" };
 
     it("POST /tasks validJSON", async () => {
         const response = await request(app).post("/tasks").send(userSentTask);
 
         expect(response.status).toBe(201);
-        expect(response.body).toStrictEqual(savedTask);
+        expect(response.body).toStrictEqual({
+            ...userSentTask,
+            done: false,
+            id: 4,
+        });
     });
 
     it("GET /tasks userSentTask saved", async () => {
@@ -78,28 +81,23 @@ const testPOST = () => {
         expect(response.body).toHaveProperty("error");
     });
 
-    it("POST /tasks invalidJSON title null, done valid", async () => {
+    it("POST /tasks invalidJSON title valid", async () => {
         const response = await request(app)
             .post("/tasks")
-            .send({ title: null, done: true });
+            .send({ title: "test" });
 
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty("error");
+        expect(response.status).toBe(201);
+        expect(response.body).toStrictEqual({
+            ...userSentTask,
+            done: false,
+            id: 5,
+        });
     });
 
-    it("POST /tasks invalidJSON title valid, done invalid", async () => {
+    it("POST /tasks invalidJSON title invalid", async () => {
         const response = await request(app)
             .post("/tasks")
-            .send({ title: "test", done: 1 });
-
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty("error");
-    });
-
-    it("POST /tasks invalidJSON title invalid, done invalid", async () => {
-        const response = await request(app)
-            .post("/tasks")
-            .send({ title: ["test"], done: 1 });
+            .send({ title: ["test"] });
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
@@ -109,7 +107,11 @@ const testPOST = () => {
         const response = await request(app).post("/tasks").send(userSentTask);
 
         expect(response.status).toBe(201);
-        expect(response.body).toStrictEqual({ ...userSentTask, id: 5 });
+        expect(response.body).toStrictEqual({
+            ...userSentTask,
+            done: false,
+            id: 6,
+        });
     });
 
     it("GET /tasks userSentTask saved", async () => {
@@ -118,6 +120,15 @@ const testPOST = () => {
         // the array has been appended to
         expect(response.body).toStrictEqual(storedTasks);
     });
+
+    // assignment task
+    it("POST /tasks some milk", async () => {
+        const buyMilk = { title: "Buy milk" };
+        const response = await request(app).post("/tasks").send(buyMilk);
+
+        expect(response.status).toBe(201);
+        expect(response.body).toStrictEqual({ ...buyMilk, done: false, id: 7 });
+    });
 };
 
 const testPUT = () => {
@@ -125,12 +136,12 @@ const testPUT = () => {
     beforeAll(reset);
 
     const userSentTask = { title: "test", done: true };
-    const savedTask = { ...userSentTask, id: 4 };
+    const savedTask = { ...userSentTask, id: 1 };
 
-    it("PUT /tasks validJSON", async () => {
-        const response = await request(app).put("/tasks").send(userSentTask);
+    it("PUT /tasks/1 validJSON", async () => {
+        const response = await request(app).put("/tasks/1").send(userSentTask);
 
-        expect(response.status).toBe(201);
+        expect(response.status).toBe(200);
         expect(response.body).toStrictEqual(savedTask);
     });
 
@@ -142,14 +153,14 @@ const testPUT = () => {
     });
 
     it("PUT /tasks invalidJSON no body", async () => {
-        const response = await request(app).put("/tasks").send();
+        const response = await request(app).put("/tasks/1").send();
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
     });
 
     it("PUT /tasks invalidJSON empty json", async () => {
-        const response = await request(app).put("/tasks").send({});
+        const response = await request(app).put("/tasks/1").send({});
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
@@ -157,7 +168,7 @@ const testPUT = () => {
 
     it("PUT /tasks invalidJSON title undefined", async () => {
         const response = await request(app)
-            .put("/tasks")
+            .put("/tasks/1")
             .send({ title: undefined });
 
         expect(response.status).toBe(400);
@@ -165,7 +176,9 @@ const testPUT = () => {
     });
 
     it("PUT /tasks invalidJSON title null", async () => {
-        const response = await request(app).put("/tasks").send({ title: null });
+        const response = await request(app)
+            .put("/tasks/1")
+            .send({ title: null });
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
@@ -173,7 +186,7 @@ const testPUT = () => {
 
     it("PUT /tasks invalidJSON title null, done valid", async () => {
         const response = await request(app)
-            .put("/tasks")
+            .put("/tasks/1")
             .send({ title: null, done: true });
 
         expect(response.status).toBe(400);
@@ -182,7 +195,7 @@ const testPUT = () => {
 
     it("PUT /tasks invalidJSON title valid, done invalid", async () => {
         const response = await request(app)
-            .put("/tasks")
+            .put("/tasks/1")
             .send({ title: "test", done: 1 });
 
         expect(response.status).toBe(400);
@@ -191,15 +204,15 @@ const testPUT = () => {
 
     it("PUT /tasks invalidJSON title invalid, done invalid", async () => {
         const response = await request(app)
-            .put("/tasks")
+            .put("/tasks/1")
             .send({ title: ["test"], done: 1 });
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
     });
 
-    it("PUT /tasks same validJSON; idempotent", async () => {
-        const response = await request(app).put("/tasks").send(userSentTask);
+    it("PUT /tasks/1 same validJSON; idempotent", async () => {
+        const response = await request(app).put("/tasks/1").send(userSentTask);
 
         expect(response.status).toBe(200);
         expect(response.body).toStrictEqual(savedTask);

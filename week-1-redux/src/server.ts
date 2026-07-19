@@ -15,7 +15,11 @@ app.use(express.json());
 // Stage 1: HTTP protocol, GET "method"/"verb"
 app.get("/", (_request, response) => {
     response.status(200);
-    response.json({ name: "Task API", version: "1.0", endpoints: ["/tasks"] });
+    response.json({
+        name: "Task API",
+        version: "1.0",
+        endpoints: ["/tasks", "/health"],
+    });
 });
 
 app.get("/health", (_request, response) => {
@@ -52,51 +56,6 @@ app.get("/tasks/:id", (request, response) => {
 
 // to not repeat code
 type ValidationResult = { success: boolean; error?: string };
-
-const validateBody = (
-    body: Task,
-    validationType: "all" | "any",
-): ValidationResult => {
-    // bad request
-    if (body === undefined) {
-        return {
-            success: false,
-            error: "missing body.",
-        };
-    }
-
-    const { title, done } = body;
-
-    if (
-        validationType === "all" ||
-        (validationType === "any" && title && done)
-    ) {
-        const titleResult = validateTitle(title);
-        const doneResult = validateDone(done);
-
-        return {
-            success: titleResult.success && doneResult.success,
-            error: (() => {
-                if (!titleResult.success && !doneResult.success) {
-                    return "both title and done missing";
-                }
-                if (!titleResult.success) {
-                    return titleResult.error;
-                }
-                return doneResult.error;
-            })(),
-        };
-    }
-
-    if (validationType === "any") {
-        return validateTitle(title);
-    }
-    if (validationType === "done") {
-        return validateDone(done);
-    }
-
-    return { success: true };
-};
 
 const validateTitle = (title: string): ValidationResult => {
     if (title === undefined) {
@@ -139,12 +98,46 @@ const validateDone = (done: boolean): ValidationResult => {
     return { success: true };
 };
 
+const validatePOST = (body): ValidationResult => {
+    if (!body) {
+        return { success: false, error: "Missing body" };
+    }
+
+    const { title } = body;
+
+    const titleResult = validateTitle(title);
+
+    if (!titleResult.success) {
+        return titleResult;
+    }
+
+    return { success: true };
+};
+
+const validatePUT = (body): ValidationResult => {
+    if (!body) {
+        return { success: false, error: "Missing body" };
+    }
+
+    const { title, done } = body;
+
+    const results = [validateTitle(title), validateDone(done)];
+
+    const isAnyInvalid = results.find((obj) => !obj.success);
+
+    if (isAnyInvalid) {
+        return isAnyInvalid;
+    }
+
+    return { success: true };
+};
+
 // Stage 3: POST create
 app.post("/tasks", (request, response) => {
     const { body } = request;
 
-    // validate
-    const { success, error } = validateBody(body, "all");
+    // validate title
+    const { success, error } = validatePOST(body);
 
     // bad request
     if (!success) {
@@ -154,13 +147,13 @@ app.post("/tasks", (request, response) => {
     }
 
     // create it
-    const { title, done } = body;
+    const { title } = body;
     const id = storedTasks.length + 1;
 
     const task = {
         id,
         title,
-        done,
+        done: false,
     };
 
     storedTasks.push(task);
@@ -170,10 +163,14 @@ app.post("/tasks", (request, response) => {
 });
 
 // Stage 4: full CRUD: PUT & DELETE
-app.put("/tasks", (request, response) => {
+app.put("/tasks/:id", (request, response) => {
     const { body } = request;
 
-    const { success, error } = validateBody(body, "any");
+    const { id: stringId } = request.params;
+
+    const id = Number(stringId);
+
+    const { success, error } = validatePUT(body);
 
     // bad request
     if (!success) {
@@ -185,33 +182,23 @@ app.put("/tasks", (request, response) => {
     const { title, done } = body;
 
     // enforce idempotancy: if task exists, dont add it again
-    const found = storedTasks.find(
-        (obj) => obj.title === title && obj.done === done,
-    );
+    const found = storedTasks.find((obj) => obj.id === id);
 
-    if (found) {
-        response.status(200);
-        response.json(found);
+    if (!found) {
+        response.status(404);
+        response.json("Not found");
         return;
     }
 
-    // create it, either one is okay
-    const id = storedTasks.length + 1;
+    found.title = title;
+    found.done = done;
 
-    const task = {
-        id,
-        title,
-        done,
-    };
-
-    storedTasks.push(task);
-
-    response.status(201);
-    response.json(task);
+    response.status(200);
+    response.json(found);
 });
 
 app.delete("/tasks/:id", (request, response) => {
-    debugger;
+    // debugger;
 
     const { id: idString } = request.params;
 
@@ -229,7 +216,7 @@ app.delete("/tasks/:id", (request, response) => {
         response.json({ error: "not found id to delete" });
     }
 
-    // delete  element
+    // delete element
     storedTasks.splice(foundIndex, 1);
     response.status(204);
     response.send();
