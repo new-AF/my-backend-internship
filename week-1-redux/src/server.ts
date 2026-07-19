@@ -36,8 +36,8 @@ app.get("/tasks", (_request, response) => {
 // Stage 2: GET by :id
 app.get("/tasks/:id", (request, response) => {
     const { params } = request;
-    const { id: idString } = params;
-    const id = Number(idString);
+    const { id: stringId } = params;
+    const id = Number(stringId);
 
     const found = storedTasks.find(({ id: storedId }) => id === storedId);
 
@@ -200,14 +200,14 @@ app.put("/tasks/:id", (request, response) => {
 app.delete("/tasks/:id", (request, response) => {
     // debugger;
 
-    const { id: idString } = request.params;
+    const { id: stringId } = request.params;
 
-    if (!idString) {
+    if (!stringId) {
         response.status(400);
         response.json({ error: "missing id to delete" });
     }
 
-    const id = Number(idString);
+    const id = Number(stringId);
 
     const foundIndex = storedTasks.findIndex((obj) => obj.id === id);
 

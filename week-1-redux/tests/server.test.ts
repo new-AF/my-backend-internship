@@ -20,12 +20,6 @@ const testGET = () => {
         expect(response.status).toBe(200);
         expect(response.body).toStrictEqual(storedTasks);
     });
-
-    it("GET /tasks/2", async () => {
-        const response = await request(app).get("/tasks/2");
-        expect(response.status).toBe(200);
-        expect(response.body).toStrictEqual(storedTasks[1]);
-    });
 };
 
 const testPOST = () => {
@@ -119,15 +113,6 @@ const testPOST = () => {
         expect(response.status).toBe(200);
         // the array has been appended to
         expect(response.body).toStrictEqual(storedTasks);
-    });
-
-    // assignment task
-    it("POST /tasks some milk", async () => {
-        const buyMilk = { title: "Buy milk" };
-        const response = await request(app).post("/tasks").send(buyMilk);
-
-        expect(response.status).toBe(201);
-        expect(response.body).toStrictEqual({ ...buyMilk, done: false, id: 7 });
     });
 };
 
@@ -258,7 +243,66 @@ const testDELETE = () => {
     });
 };
 
+const testAssignmentTasks = () => {
+    beforeAll(reset);
+
+    // assignment task
+    it("GET /tasks/1", async () => {
+        const response = await request(app).get("/tasks/1");
+        expect(response.status).toBe(200);
+        expect(response.body).toStrictEqual(storedTasks[0]);
+    });
+
+    // assignment task
+    it("GET /tasks/99", async () => {
+        const response = await request(app).get("/tasks/99");
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    // assignment task
+    it("POST /tasks some milk", async () => {
+        const buyMilk = { title: "Buy milk" };
+        const response = await request(app).post("/tasks").send(buyMilk);
+
+        expect(response.status).toBe(201);
+        expect(response.body).toStrictEqual({ ...buyMilk, done: false, id: 4 });
+    });
+
+    // create a task, update it, mark it done, delete it, and confirm with GET /tasks — all via curl, all with the right status codes ( 201 , 200 , 204 , 404 ).
+    it("POST /tasks some milk", async () => {
+        const specialTask = { title: "Special Task" };
+
+        // create it
+        const postResponse = await request(app)
+            .post("/tasks")
+            .send(specialTask);
+
+        expect(postResponse.status).toBe(201);
+        expect(postResponse.body).toStrictEqual({
+            ...specialTask,
+            done: false,
+            id: 5,
+        });
+
+        // mark it done
+        const putResponse = await request(app)
+            .put("/tasks/5")
+            .send({ title: "Special task II", done: true });
+        expect(putResponse.status).toBe(200);
+
+        // delete it
+        const deleteResponse = await request(app).delete("/tasks/5");
+        expect(deleteResponse.status).toBe(204);
+
+        // try to get it
+        const getResponse = await request(app).get("/tasks/5");
+        expect(getResponse.status).toBe(404);
+    });
+};
+
 describe("Testing GET method", () => testGET());
 describe("Testing POST method", () => testPOST());
 describe("Testing PUT method", () => testPUT());
 describe("Testing DELETE method", () => testDELETE());
+describe("Testing Assignment Tasks", () => testAssignmentTasks());
