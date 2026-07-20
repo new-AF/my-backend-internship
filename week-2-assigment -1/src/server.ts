@@ -181,7 +181,6 @@ app.put("/tasks/:id", (request, response) => {
 
     const { title, done } = body;
 
-    // enforce idempotancy: if task exists, dont add it again
     const found = storedTasks.find((obj) => obj.id === id);
 
     if (!found) {
@@ -190,8 +189,14 @@ app.put("/tasks/:id", (request, response) => {
         return;
     }
 
-    found.title = title;
-    found.done = done;
+    // enforces idempotancy: same content leaves same object
+
+    if (found.title !== title) {
+        found.title = title;
+    }
+    if (found.done !== done) {
+        found.done = done;
+    }
 
     response.status(200);
     response.json(found);

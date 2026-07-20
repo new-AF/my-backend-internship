@@ -8,7 +8,7 @@ I used TypeScript + Express as stacks
 
 [Week 1](week-1/Readme.md)
 
-# Week 1 Redux
+# Week 2 Assignment 1
 
 Because original assignment was changed (never do that)
 
