@@ -1,10 +1,25 @@
 # Week 2 Assignment 1
 
-I implemented a Task backend service and its CRUD operations through HTTP methods.
+I implemented a Tasks backend service and its CRUD operations through HTTP methods.
 
-All request bodies should be in JSON.
+All request bodies must be in JSON.
 
-All response bodies if there's one are in JSON too.
+All response bodies (if there's one) are in JSON too.
+
+# Usage
+
+```bash
+pnpm install
+pnpm dev
+```
+
+## Tests
+
+To run integration tests:
+
+```bash
+pnpm test
+```
 
 # GET /
 
@@ -45,13 +60,9 @@ Body:
 
 # GET /tasks
 
-Returns all tasks stored on the server.
+Returns JSON all tasks stored on the server, as array of objects.
 
-Returns:
-
-Status 200 OK
-
-Body example:
+Example:
 
 ```json
 [
@@ -83,7 +94,7 @@ JSON request body must have `"title"` as string.
 curl -i --json '{ "title": "Buy milk" }' http://localhost:3000/tasks
 ```
 
-Returns:
+## On success
 
 Status 201 Created
 
@@ -97,11 +108,13 @@ Body:
 }
 ```
 
-In case the input body is malformed, it returns:
+## On error
 
-Status 400 Bad request,
+If either body is missing or `"title"` or `"done"` are malformed.
 
-and error message body:
+Status 400 Bad request
+
+Body:
 
 ```json
 {
@@ -113,17 +126,57 @@ and error message body:
 
 Updates the task at `id`.
 
-Please note both `"title"` and `"done"` properties must be provided because this fits the semantics of PUT. **It replaces the resource completely.** [1]
+> Note: both `"title"` and `"done"` properties must be provided because its the semantics of PUT. **It replaces the resource completely.** [1]
 
 ```batch
 curl -i -X PUT http://localhost:3000/tasks/4 -H "Content-Type: application/json" -d '{ "title": "Special task", "done": true }'
 ```
 
-Returns:
+## On success
 
 Status 200
 
 Body:
+
+```json
+{
+    "id": 4,
+    "title": "Special task",
+    "done": true
+}
+```
+
+## On error
+
+Status 400 Bad request
+
+```json
+{
+    "error": "bad title value in request body."
+}
+```
+
+# DELETE /tasks/:id
+
+```bash
+curl -i -X DELETE http://localhost:3000/tasks/9
+```
+
+## On success
+
+Status 204 No content
+
+Doesn't return body
+
+## On error
+
+Status 404 Not Found
+
+```json
+{
+    "error": "not found id to delete"
+}
+```
 
 # References
 
