@@ -6,10 +6,8 @@ I used TypeScript + Express as stacks
 
 # Week 1
 
-[Week 1](week-1/Readme.md)
+[Week 1: Defining Endpoints](week-1/Readme.md)
 
 # Week 2 Assignment 1
 
-Because original assignment was changed (never do that)
-
-[Week 1 Redux](week-1-redux/Readme.md)
+[Week 2: Tasks CRUD API](week-2-assignment-1/Readme.md)
