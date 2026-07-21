@@ -6,7 +6,13 @@ All request bodies must be in JSON.
 
 All response bodies (if there's one) are in JSON too.
 
-# Usage
+# Live service
+
+> Note: The service is deployed on the free tier at _Render_ which spins them down after a period of inactivity. **So a cold start could take 30-60 seconds.**
+
+**https://my-backend-internship-week-2-assignment-1.onrender.com/**
+
+# Local usage
 
 ```bash
 pnpm install
