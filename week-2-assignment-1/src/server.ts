@@ -7,7 +7,15 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 export const app = express();
 
 // run swagger with ./swagger.json OpenAPI spec
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(
+    "/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+        swaggerOptions: {
+            supportedSubmitMethods: ["get", "post", "put", "delete", "patch"],
+        },
+    }),
+);
 
 // all bodies must be json
 app.use(express.json());
@@ -17,8 +25,9 @@ app.get("/", (_request, response) => {
     response.status(200);
     response.json({
         name: "Task API",
+        author: "Abdullah Fatota",
         version: "1.0",
-        endpoints: ["/tasks", "/health"],
+        endpoints: ["/tasks", "/health", "/docs"],
     });
 });
 

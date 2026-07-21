@@ -11,8 +11,8 @@ All response bodies (if there's one) are in JSON too.
 | Method | Endpoint     | Description                 | Response                         |
 | ------ | ------------ | --------------------------- | -------------------------------- |
 | GET    | `/`          | Get information about API   | `200 OK` + array of objects      |
-| GET    | `/docs`      | Access Web UI Documentation | `200 OK` + HTML                  |
 | GET    | `/health`    | Get server status           | `200 OK` + status object         |
+| GET    | `/docs`      | Access Web UI Documentation | `200 OK` + HTML                  |
 | GET    | `/tasks`     | Get all Tasks               | `200 OK` + array of task objects |
 | GET    | `/tasks/:id` | Get a task by ID            | `200 OK` + task object           |
 | POST   | `/tasks`     | Create a new task           | `201 Created` + created task     |
@@ -26,6 +26,8 @@ All response bodies (if there's one) are in JSON too.
 **https://my-backend-internship-week-2-assignment-1.onrender.com/**
 
 # Local usage
+
+Install packages & Run server
 
 ```bash
 pnpm install
@@ -42,9 +44,17 @@ pnpm run test
 
 ## Docs
 
+Run server as above, then load URL:
+
+```http
+http://localhost:3000/docs/
+```
+
+![Swagger Documentation UI showing information about API pretty much same information as presented the Readme.md but with Interactive inputs to send to API live](screenshots/swagger-ui.png)
+
 # GET /
 
-Returns information about API endpoints
+Returns information about API and its endpoints
 
 Returns:
 
@@ -55,17 +65,19 @@ Body:
 ```JSON
 {
   "name": "Task API",
+  "author": "Abdullah Fatota",
   "version": "1.0",
   "endpoints": [
     "/tasks",
-    "/health"
+    "/health",
+    "/docs"
   ]
 }
 ```
 
 # GET /health
 
-Checking if server is running.
+Returns information about service status.
 
 Returns:
 
@@ -78,6 +90,10 @@ Body:
     "status": "Ok"
 }
 ```
+
+# GET /docs
+
+Access Swagger Web UI for interactive using of API
 
 # GET /tasks
 
