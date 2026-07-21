@@ -165,7 +165,7 @@ Status 400 Bad request
 # DELETE /tasks/:id
 
 ```bash
-curl -i -X DELETE http://localhost:3000/tasks/9
+curl -i -X DELETE http://localhost:3000/tasks/4
 ```
 
 ## On success
