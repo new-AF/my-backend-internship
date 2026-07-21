@@ -10,7 +10,7 @@ All response bodies (if there's one) are in JSON too.
 
 ```bash
 pnpm install
-pnpm dev
+pnpm run server
 ```
 
 ## Tests
@@ -18,7 +18,7 @@ pnpm dev
 To run integration tests:
 
 ```bash
-pnpm test
+pnpm run test
 ```
 
 # GET /
